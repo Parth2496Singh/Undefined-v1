@@ -1,0 +1,40 @@
+
+services:
+  velzion-db:
+    image: postgres:16
+    container_name: velzion-db
+    environment:
+      POSTGRES_USER: velzion_user
+      POSTGRES_PASSWORD: velzion_password
+      POSTGRES_DB: velzion_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - velzion-db-data:/var/lib/postgresql/data
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: velzion-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: velzion-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/etc/grafana/dashboards
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+
+volumes:
+  velzion-db-data:

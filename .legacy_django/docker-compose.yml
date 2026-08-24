@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # 1. Local Postgres Database
+  db:
+    image: postgres:15-alpine
+    container_name: velzion-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: velzion_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: velzion_secret_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. The Django Control Plane
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: velzion-django
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+    command: python manage.py runserver 0.0.0.0:8000
+
+  # 3. The React SPA (Vite Development Server)
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    container_name: velzion-react
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    stdin_open: true  
+    tty: true 
+    env_file:
+      - .env
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+volumes:
+  postgres_data:

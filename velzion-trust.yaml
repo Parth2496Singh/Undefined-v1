@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'Velzion BYOC Trust Integration: Grants the Velzion Control Plane permission to provision EC2 Spot and On-Demand instances, security groups, and VPCs in your account.'
+
+Parameters:
+  VelzionCentralAccountID:
+    Type: String
+    Description: 'The AWS Account ID of the central Velzion Control Plane.'
+    Default: '815090125753'
+
+Resources:
+  VelzionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: VelzionExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${VelzionCentralAccountID}:root'
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: VelzionComputeProvisioning
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ec2:*'
+                  - 'iam:PassRole'
+                Resource: '*'
+
+Outputs:
+  VelzionRoleARN:
+    Description: 'The ARN of the Velzion Execution Role. Paste this into the Velzion IAM Login Dashboard.'
+    Value: !GetAtt VelzionExecutionRole.Arn

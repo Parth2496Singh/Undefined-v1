@@ -1,0 +1,14 @@
+go 1.27.0
+
+use (
+	./services/audit
+	./services/auth
+	./services/diablo
+	./services/notification
+	./services/observability
+	./services/telemetry
+	./services/velzard
+	./services/zegion
+	./shared
+	./workers/infra-worker
+)

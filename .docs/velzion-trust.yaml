@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Velzion BYOC Trust Role. Grants necessary permissions for orchestration.'
+Resources:
+  VelzionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: VelzionExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::123456789012:root"
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: VelzionOrchestrationPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:*
+                  - vpc:*
+                  - s3:*
+                  - iam:PassRole
+                Resource: "*"
+Outputs:
+  RoleArn:
+    Description: "The ARN of the Velzion Execution Role"
+    Value: !GetAtt VelzionExecutionRole.Arn

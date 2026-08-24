@@ -1,0 +1,157 @@
+openapi: 3.0.3
+info:
+  title: Velzion BYOC API
+  version: 1.0.0
+servers:
+  - url: /
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  /api/auth/github/login:
+    get:
+      summary: Get GitHub login URL
+      responses:
+        '200':
+          description: OK
+  /api/auth/github/repos:
+    get:
+      summary: List user repositories
+      responses:
+        '200':
+          description: OK
+  /api/auth/github/callback:
+    post:
+      summary: Handle GitHub OAuth Callback
+      responses:
+        '200':
+          description: OK
+  /api/auth/iam-role:
+    post:
+      summary: Bind IAM Role to User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arn:
+                  type: string
+      responses:
+        '200':
+          description: OK
+  /api/velzard/deployments:
+    get:
+      summary: List Velzard Deployments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    status:
+                      type: string
+                    github_repo_url:
+                      type: string
+                    branch:
+                      type: string
+                    instance_type:
+                      type: string
+                    volume_size:
+                      type: integer
+                    error_logs:
+                      type: string
+                    created_at:
+                      type: string
+  /api/velzard/deploy:
+    post:
+      summary: Trigger Velzard Deployment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repo_url:
+                  type: string
+                branch:
+                  type: string
+                instance_type:
+                  type: string
+                volume_size:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+  /api/velzard/destroy/{id}:
+    post:
+      summary: Destroy Velzard Deployment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /api/zegion/environments:
+    get:
+      summary: List Zegion Environments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    status:
+                      type: string
+                    github_repo_url:
+                      type: string
+                    pr_number:
+                      type: integer
+                    error_logs:
+                      type: string
+                    created_at:
+                      type: string
+  /api/zegion/terminate/{id}:
+    post:
+      summary: Terminate Zegion Environment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /api/admin/system/flush:
+    delete:
+      summary: Factory Reset Database (Nuclear Option)
+      responses:
+        '200':
+          description: OK
+  /api/admin/system/summary:
+    get:
+      summary: Retrieve Admin Telemetry Aggregation
+      responses:
+        '200':
+          description: OK
